@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Force - Servidor de Minecraft</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        /* Importar fuente */
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* Estilos de Contenedor General */
+        .container {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Estilo de Encabezado (Hero) */
+        .hero {
+            /* 🚨 NOTA: Reemplaza o quita la URL de imagen si no tienes una */
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('file:///C:/Users/Marc/Desktop/Web/Gemini_Generated_Image_fe2ouufe2ouufe2o.png'); /* Fondo oscuro por defecto */
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 20px;
+            text-align: center;
+            border-bottom: 5px solid #d9534f; /* Color de acento rojo */
+        }
+
+        .hero-content h1 {
+            font-size: 3em;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .hero-content p {
+            font-size: 1.5em;
+            font-weight: 300;
+        }
+
+        /* Estilos de Sección */
+        .about-us, .join-us {
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        h2 {
+            color: #d9534f;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        /* Estilo del Botón de IP */
+        .ip-button {
+            background-color: #5cb85c; /* Verde atractivo */
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .ip-button:hover {
+            background-color: #4cae4c;
+        }
+
+        /* Estilos del Footer */
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            margin-top: 40px;
+            font-size: 0.9em;
+        }
+
+        /* --- Estilos de la Ventana Modal (Pop-up) --- */
+
+        .modal {
+            display: none; /* Oculto por defecto */
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.6); /* Fondo semi-transparente */
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto; /* Centrado vertical y horizontal */
+            padding: 30px;
+            border: 1px solid #888;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .close-btn:hover,
+        .close-btn:focus {
+            color: #d9534f;
+            text-decoration: none;
+        }
+
+        .ip-display {
+            background-color: #e9ecef;
+            border: 2px dashed #d9534f;
+            padding: 10px;
+            margin: 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 5px;
+        }
+
+        .copy-button {
+            background-color: #007bff; /* Azul de botón */
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .copy-button:hover {
+            background-color: #0056b3;
+        }
+
+        .copy-message {
+            color: #5cb85c;
+            font-weight: bold;
+            height: 20px; /* Para mantener el espacio */
+        }
+
+        /* --- Sidebar / Hamburguesa --- */
+        .hamburger {
+            position: fixed;
+            top: 18px;
+            left: 18px;
+            width: 44px;
+            height: 44px;
+            background: rgba(0,0,0,0.6);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1100;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        }
+        .hamburger:focus { outline: 2px solid #d9534f; }
+
+        /* Sidebar oculto con translateX (como antes), pero con scroll interno */
+        .sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 280px;
+            height: 100%; /* ocupar toda la altura del viewport */
+            background: #1f1f1f;
+            color: #fff;
+            padding: 20px;
+            box-shadow: 4px 0 12px rgba(0,0,0,0.4);
+            transform: translateX(-100%); /* completamente fuera del viewport */
+            transition: transform 0.28s ease;
+            z-index: 1150;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            will-change: transform;
+            pointer-events: none; /* evitar interacción cuando está cerrado */
+            overflow-y: auto; /* permitir scroll interno del menú */
+            -webkit-overflow-scrolling: touch; /* scroll suave en iOS */
+            box-sizing: border-box;
+            padding-bottom: 28px; /* espacio para el botón inferior */
+        }
+         .sidebar.open { 
+             transform: translateX(0);
+             pointer-events: auto;
+         }
+ 
+         .sidebar .close-sidebar {
+             align-self: flex-end;
+             background: transparent;
+             border: none;
+             color: #fff;
+             font-size: 22px;
+             cursor: pointer;
+         }
+ 
+         .sidebar h4 {
+             margin: 8px 0 16px;
+             color: #d9534f;
+         }
+ 
+         .sidebar .sidebar-btn {
+             background: #d9534f;
+             color: white;
+             border: none;
+             padding: 12px 14px;
+             border-radius: 8px;
+             cursor: pointer;
+             font-size: 1em;
+             text-align: left;
+         }
+         .sidebar .sidebar-btn.secondary {
+             background: transparent;
+             border: 1px solid rgba(255,255,255,0.12);
+         }
+         .sidebar .sidebar-btn + .sidebar-btn { margin-top: 8px; }
+ 
+         /* overlay cuando el sidebar está abierto */
+         .sidebar-overlay {
+             position: fixed;
+             inset: 0;
+             background: rgba(0,0,0,0.45);
+             opacity: 0;
+             pointer-events: none;
+             transition: opacity 0.28s;
+             z-index: 1140;
+         }
+         .sidebar-overlay.visible {
+             opacity: 1;
+             pointer-events: auto;
+         }
+     </style>
+ </head>
+ <body>
+ 
+     <header class="hero">
+         <div class="hero-content">
+             <h1>🔴 <strong>Red Force</strong> ⛏️</h1>
+             <p>Tu nueva aventura de <strong>Survival con Mods</strong> en Minecraft.</p>
+         </div>
+     </header>
+ 
+     <main class="container">
+         <section class="about-us">
+             <h2>¿Qué es Red Force?</h2>
+             <p>
+                 Somos una comunidad apasionada de Minecraft enfocada en la experiencia <strong>Survival mejorada con una cuidada selección de Mods</strong>. Olvídate del Vanilla aburrido. En <strong>Red Force</strong>, encontrarás nuevos biomas, herramientas, criaturas y desafíos que harán que tu experiencia de supervivencia sea fresca y emocionante.
+                 ¡Construye, explora, haz equipo y domina un mundo totalmente nuevo!
+             </p>
+         </section>
+         
+         <hr>
+ 
+         <section class="join-us">
+             <h2>¿Quieres unirte a la aventura?</h2>
+             <p>¡Te estamos esperando! Es hora de que empieces tu legado en nuestro mundo.</p>
+             <button id="show-ip-btn" class="ip-button">
+                 Esta es nuestra IP
+             </button>
+         </section>
+     </main>
+ 
+     <div id="ip-modal" class="modal">
+         <div class="modal-content">
+             <span class="close-btn">&times;</span>
+             <h3>✨ ¡Únete a Red Force! ✨</h3>
+             <p>Nuestra IP es:</p>
+             <div class="ip-display">
+                 <span id="server-ip">RedForce.aternos.me</span> <button id="copy-ip-btn" class="copy-button">
+                     📋 Copiar IP
+                 </button>
+             </div>
+             <p class="copy-message" id="copy-message"></p>
+         </div>
+     </div>
+ 
+     <!-- Nuevo: botón hamburguesa y overlay -->
+     <button id="hamburger" class="hamburger" aria-label="Abrir menú" aria-expanded="false">
+         <!-- icono simple de tres líneas -->
+         <svg width="22" height="14" viewBox="0 0 24 16" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+             <rect width="24" height="2" y="0" rx="1" fill="white"></rect>
+             <rect width="24" height="2" y="7" rx="1" fill="white"></rect>
+             <rect width="24" height="2" y="14" rx="1" fill="white"></rect>
+         </svg>
+     </button>
+ 
+     <div id="sidebar-overlay" class="sidebar-overlay" tabindex="-1" aria-hidden="true"></div>
+ 
+     <aside id="sidebar" class="sidebar" aria-hidden="true">
+        <button class="close-sidebar" id="close-sidebar" aria-label="Cerrar menú">&times;</button>
+        <h4>Menú</h4>
+
+        <button class="sidebar-btn" id="btn-tienda">🛒 Tienda</button>
+        <button class="sidebar-btn secondary" id="btn-login">🔑 Iniciar sesión</button>
+        <button class="sidebar-btn secondary" id="btn-register">📝 Registrarse</button>
+
+        <!-- Botón de cerrar sesión dentro del sidebar (aparece solo si el usuario está autenticado) -->
+        <button class="sidebar-btn" id="sidebar-logout" style="display:none; margin-top:auto; background:#d9534f;">🔓 Cerrar sesión</button>
+    </aside>
+
+    <footer>
+        <p>&copy; 2025 Red Force Server | Hecho con ❤️ para la comunidad de Minecraft</p>
+        <!-- (footer limpio: botón de cerrar sesión retirado) -->
+    </footer>
+ 
+    <script type="module">
+	// Inicializar Firebase y Auth (mismas credenciales que en la página de login)
+	import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+	import { getAuth, signOut, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+	const firebaseConfig = {
+		apiKey: "AIzaSyBIH5Yf9yhB2bWFOEyqfXsbA7LAeWVo_5E",
+		authDomain: "red-force-web.firebaseapp.com",
+		projectId: "red-force-web",
+		storageBucket: "red-force-web.firebasestorage.app",
+		messagingSenderId: "581871532266",
+		appId: "1:581871532266:web:3629362913b9ba1bc03f93"
+	};
+	const app = initializeApp(firebaseConfig);
+	const auth = getAuth(app);
+
+	// Elementos a controlar
+	const btnLogin = document.getElementById('btn-login');
+	const btnRegister = document.getElementById('btn-register');
+	const btnTienda = document.getElementById('btn-tienda');
+	const footerLogout = document.getElementById('footer-logout');
+	const sidebarLogout = document.getElementById('sidebar-logout');
+	const sidebarEl = document.getElementById('sidebar');
+	const sidebarOverlay = document.getElementById('sidebar-overlay'); // añadido
+
+	// Mostrar/ocultar elementos según estado de autenticación
+	onAuthStateChanged(auth, (user) => {
+		if (user) {
+			if (btnLogin) btnLogin.style.display = 'none';
+			if (btnRegister) btnRegister.style.display = 'none';
+			if (footerLogout) footerLogout.style.display = 'inline-block';
+			if (sidebarLogout) sidebarLogout.style.display = 'block';
+		} else {
+			if (btnLogin) btnLogin.style.display = 'inline-block';
+			if (btnRegister) btnRegister.style.display = 'inline-block';
+			if (footerLogout) footerLogout.style.display = 'none';
+			if (sidebarLogout) sidebarLogout.style.display = 'none';
+		}
+	});
+
+	// Cerrar sesión desde el footer
+	if (footerLogout) {
+		footerLogout.addEventListener('click', () => {
+			signOut(auth).then(() => {
+				window.location.href = encodeURI('Iniciar sesión y Registrarse.html');
+			}).catch((err) => {
+				console.error('Error cerrando sesión:', err);
+			});
+		});
+	}
+
+	// Cerrar sesión desde el sidebar (limpio)
+	if (sidebarLogout) {
+		sidebarLogout.addEventListener('click', () => {
+			signOut(auth).then(() => {
+				// cerrar visualmente el sidebar y overlay
+				if (sidebarEl) sidebarEl.classList.remove('open');
+				if (sidebarOverlay) sidebarOverlay.classList.remove('visible');
+				// redirigir al login
+				window.location.href = encodeURI('Iniciar sesión y Registrarse.html');
+			}).catch(err => console.error('Error cerrando sesión desde sidebar:', err));
+		});
+	}
+</script>
+ 
+<script>
+	// --- Elementos ---
+	const modal = document.getElementById("ip-modal");
+	const showIpBtn = document.getElementById("show-ip-btn");
+	const modalClose = document.getElementsByClassName("close-btn")[0];
+	const copyBtn = document.getElementById("copy-ip-btn");
+	const serverIP = document.getElementById("server-ip").textContent;
+	const copyMessage = document.getElementById("copy-message");
+
+	const hamburgerBtn = document.getElementById('hamburger');
+	const sidebar = document.getElementById('sidebar');
+	const sidebarOverlay = document.getElementById('sidebar-overlay');
+	const closeSidebarBtn = document.getElementById('close-sidebar');
+
+	// --- Modal ---
+	showIpBtn.addEventListener('click', () => {
+		modal.style.display = 'block';
+		copyMessage.textContent = '';
+	});
+	modalClose.addEventListener('click', () => modal.style.display = 'none');
+	window.addEventListener('click', (e) => {
+		if (e.target === modal) modal.style.display = 'none';
+	});
+
+	// Copiar IP (con fallback)
+	copyBtn.addEventListener('click', () => {
+		if (navigator.clipboard && navigator.clipboard.writeText) {
+			navigator.clipboard.writeText(serverIP).then(() => {
+				copyMessage.textContent = "✅ ¡IP copiada al portapapeles!";
+				setTimeout(() => copyMessage.textContent = '', 3000);
+			}).catch(() => {
+				copyMessage.textContent = "❌ Error al copiar (intenta manualmente).";
+			});
+		} else {
+			const ta = document.createElement('textarea');
+			ta.value = serverIP;
+			document.body.appendChild(ta);
+			ta.select();
+			try {
+				document.execCommand('copy');
+				copyMessage.textContent = "✅ ¡IP copiada al portapapeles!";
+			} catch {
+				copyMessage.textContent = "❌ Error al copiar (intenta manualmente).";
+			}
+			document.body.removeChild(ta);
+			setTimeout(() => copyMessage.textContent = '', 3000);
+		}
+	});
+
+	// --- Sidebar control ---
+	function openSidebar() {
+		sidebar.classList.add('open');
+		sidebar.setAttribute('aria-hidden', 'false');
+		sidebarOverlay.classList.add('visible');
+		sidebarOverlay.setAttribute('aria-hidden', 'false');
+		hamburgerBtn.setAttribute('aria-expanded', 'true');
+		document.body.style.overflow = 'hidden';
+	}
+	function closeSidebar() {
+		sidebar.classList.remove('open');
+		sidebar.setAttribute('aria-hidden', 'true');
+		sidebarOverlay.classList.remove('visible');
+		sidebarOverlay.setAttribute('aria-hidden', 'true');
+		hamburgerBtn.setAttribute('aria-expanded', 'false');
+		document.body.style.overflow = '';
+	}
+
+	hamburgerBtn.addEventListener('click', () => {
+		if (sidebar.classList.contains('open')) closeSidebar();
+		else openSidebar();
+	});
+	closeSidebarBtn.addEventListener('click', closeSidebar);
+	sidebarOverlay.addEventListener('click', closeSidebar);
+	// evitar burbujeo para que clicks internos no cierren el sidebar
+	sidebar.addEventListener('click', (e) => e.stopPropagation());
+
+	// Cerrar con Escape
+	document.addEventListener('keydown', (e) => {
+		if (e.key === 'Escape') {
+			if (sidebar.classList.contains('open')) closeSidebar();
+			if (modal.style.display === 'block') modal.style.display = 'none';
+		}
+	});
+
+	// Navegación desde botones del sidebar
+	document.querySelectorAll('#sidebar .sidebar-btn').forEach(b => {
+		b.addEventListener('click', (e) => {
+			const id = e.currentTarget.id;
+			const routeMap = {
+				'btn-tienda': '/tienda',
+				'btn-login': encodeURI('Iniciar sesión y Registrarse.html?mode=login'),
+				'btn-register': encodeURI('Iniciar sesión y Registrarse.html?mode=register')
+			};
+			closeSidebar();
+			setTimeout(() => {
+				const dest = routeMap[id];
+				if (dest) window.location.href = dest;
+			}, 260);
+		});
+	});
+</script>
+
+</body>
+</html>

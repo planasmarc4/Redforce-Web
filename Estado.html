@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Red Force - Servidor de Minecraft Survival con Mods</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f9;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1100px; /* Un poco más ancho para la tienda */
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        /* Hero */
+        .hero {
+            /* usar imagen local */
+            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(0, 0, 0, 0.6)), url('file:///C:/Users/Marc/Desktop/Web/Gemini_Generated_Image_fe2ouufe2ouufe2o.png');
+            background-size: cover;
+            background-position: center;
+            color: white;
+            padding: 100px 20px;
+            text-align: center;
+            border-bottom: 5px solid #d9534f;
+        }
+
+        .hero-content h1 {
+            font-size: 3em;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.7);
+        }
+
+        .about-us, .join-us {
+            padding: 20px 0;
+            text-align: center;
+        }
+
+        h2 {
+            color: #d9534f;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        /* Botón de IP */
+        .ip-button {
+            background-color: #5cb85c;
+            color: white;
+            padding: 15px 30px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        .ip-button:hover {
+            background-color: #4cae4c;
+        }
+
+        /* Footer */
+        footer {
+            background-color: #333;
+            color: white;
+            text-align: center;
+            padding: 15px 0;
+            margin-top: 40px;
+            font-size: 0.9em;
+        }
+
+        /* --- Estilos de la Ventana Modal (Pop-up) --- */
+
+        .modal {
+            display: none; 
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.6); 
+        }
+
+        .modal-content {
+            background-color: #fff;
+            margin: 15% auto; 
+            padding: 30px;
+            width: 80%;
+            max-width: 400px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            position: relative;
+        }
+
+        .close-btn {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .ip-display {
+            background-color: #e9ecef;
+            border: 2px dashed #d9534f;
+            padding: 10px;
+            margin: 20px 0;
+            font-size: 1.3em;
+            font-weight: bold;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-radius: 5px;
+        }
+
+        .copy-button {
+            background-color: #007bff;
+            color: white;
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .copy-message {
+            color: #5cb85c;
+            font-weight: bold;
+            height: 20px;
+        }
+
+        /* --- Estilos de la Tarjeta de Estado --- */
+
+        .server-status {
+            text-align: center;
+            padding: 20px 0;
+        }
+
+        .status-card {
+            max-width: 350px;
+            margin: 20px auto;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+            background-color: #ffffff;
+            border: 3px solid #f0ad4e; /* Default: Loading */
+        }
+
+        .status-card.online { border-color: #5cb85c; }
+        .status-card.offline { border-color: #d9534f; }
+
+        .status-title { font-size: 1.8em; font-weight: 700; color: #d9534f; margin-bottom: 10px; }
+
+        .status-indicator { display: flex; align-items: center; justify-content: center; margin-bottom: 15px; }
+
+        .dot { width: 12px; height: 12px; border-radius: 50%; margin-right: 10px; }
+        .status-card.online .dot { background-color: #5cb85c; }
+        .status-card.offline .dot { background-color: #d9534f; }
+        .status-card.loading .dot { background-color: #f0ad4e; }
+
+        .players-info { font-size: 1.2em; color: #444; margin: 10px 0; padding: 10px; background-color: #f8f8f8; border-radius: 6px; }
+
+        .ip-info { font-size: 0.9em; color: #777; margin-top: 15px; }
+
+
+        /* --- Estilos de la Tienda --- */
+        .store { padding: 40px 0; text-align: center; }
+
+        .store-grid {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .product-card {
+            background: white;
+            border-radius: 10px;
+            width: 300px;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+            position: relative;
+            border-top: 5px solid #ccc;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .product-card:hover { transform: translateY(-10px); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
+
+        .product-card.vip { border-top-color: #f0ad4e; }
+        .product-card.elite { border-top-color: #d9534f; }
+        .product-card.keys { border-top-color: #5bc0de; }
+
+        .product-card h3 { margin-top: 10px; font-size: 1.5em; color: #333; }
+        .price { font-size: 2em; font-weight: bold; color: #333; margin: 10px 0; }
+        .product-card ul { text-align: left; padding-left: 20px; margin-bottom: 20px; color: #555; }
+        .product-card li { margin-bottom: 5px; }
+        .desc { color: #666; font-style: italic; margin-bottom: 20px; }
+
+        .buy-btn {
+            display: block;
+            background-color: #333;
+            color: white;
+            padding: 10px;
+            text-decoration: none;
+            border-radius: 5px;
+            font-weight: bold;
+            transition: background 0.3s;
+        }
+
+        .buy-btn:hover { background-color: #5cb85c; }
+
+        .badge {
+            position: absolute;
+            top: -10px;
+            right: -10px;
+            background-color: #d9534f;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.8em;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+<body>
+
+    <header class="hero">
+        <div class="hero-content">
+            <h1>🔴 <strong>Red Force</strong> ⛏️</h1>
+            <p>Tu nueva aventura de <strong>Survival con Mods</strong> en Minecraft.</p>
+        </div>
+    </header>
+
+    <main class="container">
+        
+        <section class="server-status">
+            <h2>📡 Estado del Servidor</h2>
+            <div id="status-card" class="status-card loading">
+                <p class="status-title">Red Force</p>
+                <div class="status-indicator">
+                    <span id="indicator-dot" class="dot"></span>
+                    <span id="server-state">Cargando estado...</span>
+                </div>
+                <p class="players-info">
+                    👥 <strong>Jugadores:</strong> <span id="player-count">--</span>/<span id="max-players">--</span>
+                </p>
+                <p class="ip-info">IP: RedForce.aternos.me</p>
+            </div>
+        </section>
+
+        <hr>
+
+        <section class="about-us">
+            <h2>¿Qué es Red Force?</h2>
+            <p>
+                Somos una comunidad apasionada de Minecraft enfocada en la experiencia <strong>Survival mejorada con una cuidada selección de Mods</strong>. Olvídate del Vanilla aburrido. En <strong>Red Force</strong>, encontrarás nuevos biomas, herramientas, criaturas y desafíos que harán que tu experiencia de supervivencia sea fresca y emocionante.
+                ¡Construye, explora, haz equipo y domina un mundo totalmente nuevo!
+            </p>
+        </section>
+        
+        <hr>
+
+        <section class="store" id="tienda">
+            <h2>🛒 Tienda Oficial</h2>
+            <p>Apoya a <strong>Red Force</strong> y consigue recompensas exclusivas.</p>
+            
+            <div class="store-grid">
+                <div class="product-card vip">
+                    <div class="badge">Más vendido</div>
+                    <h3>Rango VIP</h3>
+                    <p class="price">5.00€</p>
+                    <ul>
+                        <li>✅ Prefijo [VIP] en chat</li>
+                        <li>✅ Acceso al comando /fly</li>
+                        <li>✅ Kit de Diamante mensual</li>
+                        <li>✅ 5 Homes adicionales</li>
+                    </ul>
+                    <a href="https://tu-tienda.craftingstore.net/vip" target="_blank" class="buy-btn">Comprar Ahora</a>
+                </div>
+
+                <div class="product-card elite">
+                    <h3>Rango ELITE</h3>
+                    <p class="price">10.00€</p>
+                    <ul>
+                        <li>🔥 Todo lo del VIP</li>
+                        <li>🔥 Prefijo [ELITE] Rojo</li>
+                        <li>🔥 Acceso a zona exclusiva</li>
+                        <li>🔥 Reparación de ítems gratis</li>
+                    </ul>
+                    <a href="https://tu-tienda.craftingstore.net/elite" target="_blank" class="buy-btn">Comprar Ahora</a>
+                </div>
+
+                <div class="product-card keys">
+                    <h3>5x Llaves Míticas</h3>
+                    <p class="price">3.00€</p>
+                    <p class="desc">Prueba tu suerte en la caja mítica del spawn. ¡Posibilidad de ganar Elytras!</p>
+                    <a href="https://tu-tienda.craftingstore.net/keys" target="_blank" class="buy-btn">Comprar Ahora</a>
+                </div>
+            </div>
+        </section>
+
+        <hr>
+        
+        <section class="join-us">
+            <h2>¿Quieres unirte a la aventura?</h2>
+            <p>¡Te estamos esperando! Es hora de que empieces tu legado en nuestro mundo.</p>
+            <button id="show-ip-btn" class="ip-button">
+                Esta es nuestra IP
+            </button>
+        </section>
+    </main>
+
+    <div id="ip-modal" class="modal">
+        <div class="modal-content">
+            <span class="close-btn">&times;</span>
+            <h3>✨ ¡Únete a Red Force! ✨</h3>
+            <p>Nuestra IP es:</p>
+            <div class="ip-display">
+                <span id="server-ip">RedForce.aternos.me</span> <button id="copy-ip-btn" class="copy-button">
+                    📋 Copiar IP
+                </button>
+            </div>
+            <p class="copy-message" id="copy-message"></p>
+        </div>
+    </div>
+
+    <footer>
+        <p>&copy; 2025 Red Force Server | Hecho con ❤️ para la comunidad de Minecraft</p>
+    </footer>
+
+    <script>
+        // --- 1. Lógica del Estado del Servidor ---
+
+        const SERVER_IP = "RedForce.aternos.me"; // dominio actualizado
+        const API_URL = `https://api.minetools.eu/ping/${SERVER_IP}`;
+
+        const statusCard = document.getElementById('status-card');
+        const serverState = document.getElementById('server-state');
+        const playerCount = document.getElementById('player-count');
+        const maxPlayers = document.getElementById('max-players');
+
+        function updateServerStatus() {
+            statusCard.className = 'status-card loading';
+            serverState.innerText = 'Consultando...';
+            
+            fetch(API_URL)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.error || !data.players) {
+                        statusCard.className = 'status-card offline';
+                        serverState.innerText = '❌ OFFLINE';
+                        playerCount.innerText = '0';
+                        maxPlayers.innerText = '0';
+                    } else {
+                        statusCard.className = 'status-card online';
+                        serverState.innerText = '✅ ONLINE';
+                        playerCount.innerText = data.players.now;
+                        maxPlayers.innerText = data.players.max;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al obtener estado del servidor:', error);
+                    statusCard.className = 'status-card offline';
+                    serverState.innerText = '❌ OFFLINE (Error de red)';
+                    playerCount.innerText = '0';
+                    maxPlayers.innerText = '0';
+                });
+        }
+
+        updateServerStatus();
+        setInterval(updateServerStatus, 30000); // Actualiza cada 30 segundos
+
+
+        // --- 2. Lógica del Pop-up de IP ---
+
+        const modal = document.getElementById("ip-modal");
+        const btn = document.getElementById("show-ip-btn");
+        const span = document.getElementsByClassName("close-btn")[0];
+        const copyBtn = document.getElementById("copy-ip-btn");
+        const serverIP = document.getElementById("server-ip").textContent;
+        const copyMessage = document.getElementById("copy-message");
+
+        // Abre el modal
+        btn.onclick = function() {
+          modal.style.display = "block";
+          copyMessage.textContent = ""; 
+        }
+
+        // Cierra el modal (x)
+        span.onclick = function() {
+          modal.style.display = "none";
+        }
+
+        // Cierra el modal (clic fuera)
+        window.onclick = function(event) {
+          if (event.target == modal) {
+            modal.style.display = "none";
+          }
+        }
+
+        // Copiar IP
+        copyBtn.onclick = function() {
+            navigator.clipboard.writeText(serverIP).then(() => {
+                copyMessage.textContent = "✅ ¡IP copiada al portapapeles!";
+                
+                setTimeout(() => {
+                    copyMessage.textContent = "";
+                }, 3000);
+                
+            }).catch(err => {
+                console.error('Error al copiar: ', err);
+                copyMessage.textContent = "❌ Error al copiar.";
+            });
+        }
+    </script>
+
+</body>
+</html>
